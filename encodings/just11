@@ -1,0 +1,95 @@
+% ===================================== INPUT ===================================== %
+% matrice 5x5
+% cell(R, C, V).
+dim(4).
+
+% [2] [1] [1] [1]
+% [2] [3] [1] [5]
+% [2] [3] [1] [2]
+% [2] [1] [1] [3]
+cell(0,0,2).
+cell(0,1,1).
+cell(0,2,1).
+cell(0,3,1).
+cell(1,0,2).
+cell(1,1,3).
+cell(1,2,1).
+cell(1,3,5).
+cell(2,0,2).
+cell(2,1,3).
+cell(2,2,1).
+cell(2,3,2).
+cell(3,0,2).
+cell(3,1,1).
+cell(3,2,1).
+cell(3,3,3).
+
+
+% ===================================== GUESS ===================================== %
+% ==== Scegliamo UNA sola cella
+choose(R, C) | noChoose(R, C) :- cell(R, C, _).
+:- #count{R,C : choose(R, C)} != 1. % ==== Se non ci sono mosse diventa INCONSISTENTE
+:- choose(R,C), not has_neighborhoors(R,C).
+has_neighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
+
+
+
+% ===================================== VICINATO ===================================== %
+% ==== (R,C) è vicino di (R1,C1) se:
+% ====   - hanno stesso valore;
+% ====   - le loro celle differisicono di una sola posizione (riga o colonna).
+
+% ==== Utilità: Celle uguali con se stesse
+sameCell(R, C, R, C) :- cell(R, C, V).
+
+% ==== Vicino sopra o sotto
+neighborhoors(R1, C, R2, C) :- R1 != R2, cell(R1, C, V), cell(R2, C, V), &abs(R1-R2; Diff), Diff = 1.
+
+% ==== Vicino destra o sinistra
+neighborhoors(R, C1, R, C2) :- C1 != C2, cell(R, C1, V), cell(R, C2, V), &abs(C1-C2; Diff), Diff = 1.
+
+neighborhoors(R1, C1, R3, C3) :- cell(R1, C1, V), cell(R2, C2, V), cell(R3, C3, V),
+                                 not sameCell(R1, C1, R2, C2), 
+                                 not sameCell(R1, C1, R3, C3),
+                                 not sameCell(R2, C2, R3, C3),
+                                 neighborhoors(R1, C1, R2, C2),
+                                 neighborhoors(R2, C2, R3, C3).
+
+
+
+% ==== Per ogni cella (R,C), conto quanti vicini ha.
+% ==== NOTA: Se una cella ha N vicini, allora N celle avranno gli stessi N vicini
+numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(R, C, R1, C1)}.
+
+
+
+
+
+
+% ===================================== WEAK CONSTRAINTS ===================================== %
+
+
+% ==== (1) Scegliere celle più in basso a destra, così da avere numeri grandi in basso
+:~ choose(R,C), dim(D), Diff = D-R. [Diff@3, R,C]
+:~ choose(R,C), dim(D), Diff = D-C. [Diff@2, R,C]
+
+
+% ==== (2) Effettuare una previsione della matrice all iterazione successiva
+% ====     e scegliere una cella tale per cui, alla prossima iterazione,
+% ====     massimizziamo il numero di scelte a disposizione (basandoci su cosa sappiamo).
+nextCell(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
+nextCell(R, C, V) :- choose(R1, C1), V = 0, neighborhoors(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
+nextCell(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighborhoors(R1,C1,R,C). % ==== Copio celle non modificate
+
+
+
+% ==== Scegliere una cella che, col valore aggiornato, sia vicina a una cella con stesso valore
+
+
+
+% ==== (3) Preferenza celle con maggior numero di vicini
+maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
+:~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighb(N). [1@1, R,C]
+
+#show nextCell/3.
+#show choose/2.
