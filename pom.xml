@@ -61,6 +61,26 @@
 			<version>8.9</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.embASP</groupId>
+			<artifactId>ai-embASP</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${project.basedir}/lib/embASP.jar</systemPath>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.antlr</groupId>
+			<artifactId>ai-antlr</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${project.basedir}/lib/antlr-4.7-complete.jar</systemPath>
+		</dependency>
+
+
+
 	</dependencies>
+
+
 
 </project>
