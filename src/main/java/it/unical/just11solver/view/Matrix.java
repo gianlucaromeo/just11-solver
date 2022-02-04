@@ -10,7 +10,7 @@ import javafx.scene.layout.GridPane;
 
 public class Matrix extends GridPane {
 
-	InputProgram facts = new ASPInputProgram();
+	//private InputProgram facts = new ASPInputProgram();
 
 	private int currentMax = 1;
 	List<CellView> cellViews = null;
@@ -21,7 +21,7 @@ public class Matrix extends GridPane {
 	 */
 	public void update(List<CellView> cellViews) {
 
-		facts = new InputProgram();
+		//facts = new InputProgram();
 		getChildren().clear();
 
 		this.cellViews = cellViews;
@@ -40,6 +40,10 @@ public class Matrix extends GridPane {
 		});
 
 	}
+	
+	public List<CellView> getCellViews(){
+		return cellViews;
+	}
 
 	private void addCellToFacts(Cell cell) {
 
@@ -54,7 +58,8 @@ public class Matrix extends GridPane {
 	}
 
 	public InputProgram getFacts() {
-		return facts;
+		//return facts;
+		return null;
 	}
 
 	public int getCurrentMax() {

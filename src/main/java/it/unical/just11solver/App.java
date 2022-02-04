@@ -40,7 +40,8 @@ public class App extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
+		// cambiare su windows
+		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2Linux"));
 
 		ASPMapper.getInstance().registerClass(Cell.class);
 		ASPMapper.getInstance().registerClass(Choose.class);
@@ -51,28 +52,37 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		handler.addProgram(Matrix.getInstance().getFacts());
+		InputProgram facts = new ASPInputProgram();
+		for (CellView cell : Matrix.getInstance().getCellViews()) {
+			facts.addObjectInput(cell.getCellModel());
+		}
+
+
+		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
 		encoding.addFilesPath(encodingResource);
 
 		handler.addProgram(encoding);
-		
-		InputProgram facts = new ASPInputProgram();
-		facts.addObjectInput(new Cell(2,2,2));
-		
-		/*
-		 * Output o = handler.startSync();
-		 * 
-		 * AnswerSets answerSets = (AnswerSets) o; AnswerSet optimum =
-		 * answerSets.getOptimalAnswerSets().get(0);
-		 * 
-		 * //List<CellView> newCellViews = new ArrayList(); for (Object obj :
-		 * optimum.getAtoms()) { if (obj instanceof Choose) { Choose choose = (Choose)
-		 * obj; System.out.println("Choose: " + choose.toString()); CellView cellView =
-		 * Matrix.getInstance().getCellView(choose.getRow(), choose.getColumn());
-		 * Matrix.getInstance().onClick(cellView); } }
-		 */
+
+		Output o = handler.startSync();
+
+		AnswerSets answerSets = (AnswerSets) o;
+		System.out.println(((AnswerSets) o).getAnswerSetsString());
+		AnswerSet optimum = answerSets.getOptimalAnswerSets().get(0);
+
+		//for (AnswerSet a : answerSets.getOptimalAnswerSets()) {
+			for (Object obj : optimum.getAtoms()) {
+			
+				if (obj instanceof Choose) {
+					Choose choose = (Choose) obj;
+					System.out.println("Choose: " + choose.toString());
+					CellView cellView = Matrix.getInstance().getCellView(choose.getRow(), choose.getColumn());
+					Matrix.getInstance().onClick(cellView);
+				}
+				
+			}
+		//}
 
 	}
 }

@@ -20,11 +20,11 @@ has_neighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
 
 
 % ===================================== VICINATO ===================================== %
-% ==== (R,C) è vicino di (R1,C1) se:
+% ==== (R,C) ï¿½ vicino di (R1,C1) se:
 % ====   - hanno stesso valore;
 % ====   - le loro celle differisicono di una sola posizione (riga o colonna).
 
-% ==== Utilità: Celle uguali con se stesse
+% ==== Utilitï¿½: Celle uguali con se stesse
 sameCell(R, C, R, C) :- cell(R, C, V).
 
 % ==== Vicino sopra o sotto
@@ -54,7 +54,7 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 % ===================================== WEAK CONSTRAINTS ===================================== %
 
 
-% ==== (1) Scegliere celle più in basso a destra, così da avere numeri grandi in basso
+% ==== (1) Scegliere celle piï¿½ in basso a destra, cosï¿½ da avere numeri grandi in basso
 :~ choose(R,C), dim(D), Diff = D-R. [Diff@3, R,C]
 :~ choose(R,C), dim(D), Diff = D-C. [Diff@2, R,C]
 
@@ -75,3 +75,6 @@ nextCell(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighbo
 % ==== (3) Preferenza celle con maggior numero di vicini
 maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
 :~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighb(N). [1@1, R,C]
+
+
+#show choose/2.
