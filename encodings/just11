@@ -77,4 +77,5 @@ maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
 :~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighb(N). [1@1, R,C]
 
 
+#show nextCell/3.
 #show choose/2.

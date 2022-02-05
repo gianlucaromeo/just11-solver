@@ -1,18 +1,16 @@
 package it.unical.just11solver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 
 import it.unical.just11solver.model.Cell;
 import it.unical.just11solver.model.Choose;
+import it.unical.just11solver.model.NextCell;
 import it.unical.just11solver.view.CellView;
 import it.unical.just11solver.view.MainContainer;
 import it.unical.just11solver.view.Matrix;
 import it.unical.mat.embasp.base.Handler;
 import it.unical.mat.embasp.base.InputProgram;
 import it.unical.mat.embasp.base.Output;
-import it.unical.mat.embasp.languages.IllegalAnnotationException;
-import it.unical.mat.embasp.languages.ObjectNotValidException;
 import it.unical.mat.embasp.languages.asp.ASPInputProgram;
 import it.unical.mat.embasp.languages.asp.ASPMapper;
 import it.unical.mat.embasp.languages.asp.AnswerSet;
@@ -41,9 +39,10 @@ public class App extends Application {
 	public void start(Stage stage) throws Exception {
 
 		// cambiare su windows
-		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2Linux"));
+		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
 
 		ASPMapper.getInstance().registerClass(Cell.class);
+		ASPMapper.getInstance().registerClass(NextCell.class);
 		ASPMapper.getInstance().registerClass(Choose.class);
 
 		Scene scene = new Scene(MainContainer.getInstance(), 600, 600);
@@ -52,37 +51,69 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		InputProgram facts = new ASPInputProgram();
-		for (CellView cell : Matrix.getInstance().getCellViews()) {
-			facts.addObjectInput(cell.getCellModel());
-		}
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(500), new EventHandler<ActionEvent>() {
 
-
-		handler.addProgram(facts);
-
-		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath(encodingResource);
-
-		handler.addProgram(encoding);
-
-		Output o = handler.startSync();
-
-		AnswerSets answerSets = (AnswerSets) o;
-		System.out.println(((AnswerSets) o).getAnswerSetsString());
-		AnswerSet optimum = answerSets.getOptimalAnswerSets().get(0);
-
-		//for (AnswerSet a : answerSets.getOptimalAnswerSets()) {
-			for (Object obj : optimum.getAtoms()) {
-			
-				if (obj instanceof Choose) {
-					Choose choose = (Choose) obj;
-					System.out.println("Choose: " + choose.toString());
-					CellView cellView = Matrix.getInstance().getCellView(choose.getRow(), choose.getColumn());
-					Matrix.getInstance().onClick(cellView);
-				}
+			@Override
+			public void handle(ActionEvent event) {
 				
+				InputProgram facts = new ASPInputProgram();
+				for (CellView[] cellViews : Matrix.getInstance().getCellViews()) {
+					for (CellView cell : cellViews) {
+						try {
+							facts.addObjectInput(cell.getCellModel());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
+				handler.removeAll();
+				handler.addProgram(facts);
+
+				InputProgram encoding = new ASPInputProgram();
+				encoding.addFilesPath(encodingResource);
+
+				handler.addProgram(encoding);
+
+				Output o = handler.startSync();
+
+				AnswerSets answerSets = (AnswerSets) o;
+				AnswerSet optimum = new AnswerSet(null);
+				try {
+					optimum = answerSets.getOptimalAnswerSets().get(0);
+				} catch (Exception e) {
+					System.out.println("NO MOVES!!!!");
+					System.exit(1);
+				}
+				System.out.println("\nOttimo ----> " + optimum.toString());
+
+				CellView[][] newCellViews = new CellView[5][5];
+				try {
+					for (Object obj : optimum.getAtoms()) {
+						if (obj instanceof NextCell) {
+							NextCell nextCell = (NextCell) obj;
+							if (nextCell.getValue() == 11) {
+								System.out.println("FINE!!!!");
+								System.exit(1);
+							}
+							Cell newCell = new Cell(nextCell);
+							CellView newCellView = new CellView(newCell);
+							newCellViews[newCell.getRow()][newCell.getColumn()] = newCellView;
+						}
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException | InstantiationException e) {
+					System.out.println("ERROR");
+					e.printStackTrace();
+				}
+
+				Matrix.getInstance().update(newCellViews);
 			}
-		//}
+
+		}));
+
+		t.setCycleCount(Timeline.INDEFINITE);
+		t.play();
 
 	}
 }

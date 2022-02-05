@@ -1,65 +1,103 @@
 package it.unical.just11solver.view;
 
-import java.util.List;
-
 import it.unical.just11solver.model.Cell;
-import it.unical.just11solver.util.CalculateNewMatrix;
-import it.unical.mat.embasp.base.InputProgram;
-import it.unical.mat.embasp.languages.asp.ASPInputProgram;
+import it.unical.just11solver.util.RandomGenerator;
 import javafx.scene.layout.GridPane;
 
 public class Matrix extends GridPane {
 
-	//private InputProgram facts = new ASPInputProgram();
-
-	private int currentMax = 1;
-	List<CellView> cellViews = null;
+	private int currentMax = 3;
+	CellView[][] m = new CellView[5][5];
 
 	/*
 	 * Add cells to the matrix and check if there is a new max value (to generate
 	 * random numbers).
 	 */
-	public void update(List<CellView> cellViews) {
+	public void update(CellView[][] newMatrix) {
 
-		//facts = new InputProgram();
-		getChildren().clear();
-
-		this.cellViews = cellViews;
-		cellViews.forEach((cellView) -> {
-
-			Cell cell = cellView.getCellModel();
-			add(cellView, cell.getColumn(), cell.getRow());
-
-			addCellToFacts(cell);
-
-			int v = cell.getValue();
-			if (v > currentMax) {
-				currentMax = v;
+		m = newMatrix;
+		moveToBottom();
+		
+		System.out.println("\n\nNew (After moveToBottom())");
+		
+		for (int r = 0; r < 5; ++r) {
+			
+			for (int c = 0; c < 5; ++c) {
+				
+				Cell cell = m[r][c].getCellModel();
+				
+				if (cell.getValue() == 0) {
+					m[r][c].update(RandomGenerator.rand(1, currentMax));
+				}
+				
+				add(m[r][c], cell.getColumn(), cell.getRow());
+				if (cell.getValue() > currentMax) {
+					currentMax = cell.getValue();
+				}
+				
+				System.out.print("[" + m[r][c].getCellModel().getValue() + "]");
+				
 			}
-
-		});
+			
+			System.out.println();
+			
+		}
+		
 
 	}
 	
-	public List<CellView> getCellViews(){
-		return cellViews;
-	}
-
-	private void addCellToFacts(Cell cell) {
-
-		try {
-			System.out.println(cell);
-			//facts.addObjectInput(cell);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private void moveToBottom() {
+		for (int r = 3; r >= 0; --r) {
+			for (int c = 0; c < 5; ++c) {
+				Cell current = m[r][c].getCellModel();
+				if (current.getValue() != 0) {
+					move(current, getNewRow(current));
+				}
+			}
 		}
-
 	}
+	
+	private void move(Cell current, int newRow) {
+		
+		if (current.getRow() == newRow) {
+			return;
+		}
+		
+		int currentValue = current.getValue();
+		m[newRow][current.getColumn()].update(currentValue);
+		m[current.getRow()][current.getColumn()].update(0);
+		
+		
+	}
+	
+	/*
+	 * Ritorna la nuova riga in cui spostare una cella.
+	 * Se la cella non può essere spostata,
+	 * la nuova riga rimane uguale alla precedente.
+	 * */
+	private int getNewRow(Cell cell) {
+		
+		int currentRow = cell.getRow();
+		int col = cell.getColumn();
+		
+		boolean hasSpots = true;
+		while (hasSpots && currentRow < 4) {
+			
+			if (m[currentRow + 1][col].getCellModel().getValue() == 0) {
+				++currentRow;
+			} else {
+				hasSpots = false;
+			}
+			
+		}
+		
+		return currentRow;
+		
+	}
+	
 
-	public InputProgram getFacts() {
-		//return facts;
-		return null;
+	public CellView[][] getCellViews() {
+		return m;
 	}
 
 	public int getCurrentMax() {
@@ -92,7 +130,7 @@ public class Matrix extends GridPane {
 	}
 
 	public void onClick(CellView cellView) {
-		update(CalculateNewMatrix.onClick(cellView, cellViews));
+		System.out.println("Clicked on: " + cellView.getCellModel().toString());
 	}
 
 }

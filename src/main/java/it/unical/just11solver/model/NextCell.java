@@ -3,8 +3,8 @@ package it.unical.just11solver.model;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("cell")
-public class Cell {
+@Id("nextCell")
+public class NextCell {
 
 	@Param(0)
 	private int row;
@@ -15,19 +15,13 @@ public class Cell {
 	@Param(2)
 	private int value;
 
-	public Cell(int r, int c, int v) {
+	public NextCell(int r, int c, int v) {
 		this.row = r;
 		this.column = c;
 		this.value = v;
 	}
 
-	public Cell() {}
-
-	public Cell(NextCell nextCell) {
-		this.row = nextCell.getRow();
-		this.column = nextCell.getColumn();
-		this.value = nextCell.getValue();
-	}
+	public NextCell() {}
 
 	public int getRow() {
 		return row;
@@ -55,7 +49,7 @@ public class Cell {
 	
 	@Override
 	public String toString() {
-		return "(" + row + ", " + column + ", val: " + value + ")";
+		return "[new](" + row + ", " + column + ", val: " + value + ")";
 	}
 
 }

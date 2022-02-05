@@ -30,5 +30,10 @@ public class CellView extends Button implements EventHandler<MouseEvent>{
 		setMinWidth(50);
 		setMinHeight(50);
 	}
+
+	public void update(int currentValue) {
+		cellModel.setValue(currentValue);
+		setText(""+currentValue);
+	}
 	
 }

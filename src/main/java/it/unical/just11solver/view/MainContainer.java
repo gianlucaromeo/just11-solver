@@ -23,16 +23,20 @@ public class MainContainer extends BorderPane {
 	}
 	
 	private MainContainer() {
-		List<CellView> allCells = new ArrayList();
+		System.out.println("Initial Matrix:");
+		CellView[][] newCellViews = new CellView[5][5];
 		setCenter(Matrix.getInstance());
 		for (int r = 0; r < 5; r++) {
 			for (int c = 0; c < 5; c++) {
 				Cell cell = new Cell(r, c, RandomGenerator.rand(1, 3)); // TODO Move values to constants
 				CellView cellView = new CellView(cell);
-				allCells.add(cellView);
+				newCellViews[r][c] = cellView;
+				System.out.print("[" + cell.getValue() + "]");
 			}
+			System.out.println();
 		}
-		Matrix.getInstance().update(allCells);
+		System.out.println("_______________");
+		Matrix.getInstance().update(newCellViews);
 		setStyle();
 	}
 	
