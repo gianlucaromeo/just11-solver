@@ -125,8 +125,9 @@ public class Matrix extends GridPane {
 	}
 
 	private void setStyle() {
-		setMaxWidth(50 * 5 + 2 * 5);
-		setMaxHeight(50 * 5 + 2 * 5);
+		//setMaxWidth(50 * 5 + 2 * 5);
+		//setMaxHeight(50 * 5 + 2 * 5);
+		getStyleClass().add("just11-cells-container");
 	}
 
 	public void onClick(CellView cellView) {

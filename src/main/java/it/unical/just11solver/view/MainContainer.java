@@ -1,14 +1,10 @@
 package it.unical.just11solver.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import it.unical.just11solver.model.Cell;
 import it.unical.just11solver.util.RandomGenerator;
 import javafx.scene.layout.BorderPane;
 
-public class MainContainer extends BorderPane {
-	
+public class MainContainer extends BorderPane {	
 	
 	/*
 	 * Singleton
@@ -37,11 +33,12 @@ public class MainContainer extends BorderPane {
 		}
 		System.out.println("_______________");
 		Matrix.getInstance().update(newCellViews);
+		setBottom(Footer.getInstance());
 		setStyle();
 	}
 	
 	public void setStyle() {
-		
+		getStyleClass().add("just11-main-container");
 	}
 	
 }

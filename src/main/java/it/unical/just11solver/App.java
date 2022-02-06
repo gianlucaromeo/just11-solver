@@ -38,20 +38,21 @@ public class App extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		// cambiare su windows
+		// cambiare su windows/linux
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
 
 		ASPMapper.getInstance().registerClass(Cell.class);
 		ASPMapper.getInstance().registerClass(NextCell.class);
 		ASPMapper.getInstance().registerClass(Choose.class);
 
-		Scene scene = new Scene(MainContainer.getInstance(), 600, 600);
+		Scene scene = new Scene(MainContainer.getInstance(), 400, 400);
+		scene.getStylesheets().add(getClass().getResource("/application/css/style.css").toExternalForm());
 
 		stage.setScene(scene);
 		stage.setResizable(false);
 		stage.show();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(500), new EventHandler<ActionEvent>() {
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(700), new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -83,6 +84,7 @@ public class App extends Application {
 					optimum = answerSets.getOptimalAnswerSets().get(0);
 				} catch (Exception e) {
 					System.out.println("NO MOVES!!!!");
+					//event.consume();
 					System.exit(1);
 				}
 				System.out.println("\nOttimo ----> " + optimum.toString());
