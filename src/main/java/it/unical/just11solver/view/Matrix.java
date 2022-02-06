@@ -103,6 +103,10 @@ public class Matrix extends GridPane {
 	public int getCurrentMax() {
 		return currentMax;
 	}
+	
+	public void setCurrentMax(int currentMax) {
+		this.currentMax = currentMax;
+	}
 
 	public CellView getCellView(int row, int column) {
 		return (CellView) getChildren().get(row * 5 + column);

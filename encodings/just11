@@ -3,12 +3,6 @@
 % cell(R, C, V).
 dim(4).
 
-% [2] [1] [1] [1]
-% [2] [3] [1] [5]
-% [2] [3] [1] [2]
-% [2] [1] [1] [3]
-
-
 
 % ===================================== GUESS ===================================== %
 % ==== Scegliamo UNA sola cella
@@ -17,10 +11,11 @@ choose(R, C) | noChoose(R, C) :- cell(R, C, _).
 :- choose(R,C), not has_neighborhoors(R,C).
 has_neighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
 
+:- cell(D,D-1,V), cell(D,D,V+1), dim(D), has_neighborhoors(D,D-1), not choose(D,D-1).
 
 
 % ===================================== VICINATO ===================================== %
-% ==== (R,C) ï¿½ vicino di (R1,C1) se:
+% ==== (R,C) e vicino di (R1,C1) se:
 % ====   - hanno stesso valore;
 % ====   - le loro celle differisicono di una sola posizione (riga o colonna).
 
@@ -50,14 +45,24 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 
 
 
-
 % ===================================== WEAK CONSTRAINTS ===================================== %
 
 
-% ==== (1) Scegliere celle piï¿½ in basso a destra, cosï¿½ da avere numeri grandi in basso
-:~ choose(R,C), dim(D), Diff = D-R. [Diff@3, R,C]
-:~ choose(R,C), dim(D), Diff = D-C. [Diff@2, R,C]
 
+% ==== Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
+% ==== PROBLEMA: Non funziona se non abbiamo la matrice delliterazione successiva
+%nextNeigh(R1,C):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
+%nextNeigh(R,C1):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
+%numbOfNextNeigh(N):- #count{ R,C : nextNeigh(R,C)}=N.
+%:~ numbOfNextNeigh(N). [25-N@2]
+
+
+% ==== (1) Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
+:~ choose(R,C), dim(D), Diff = D-R. [Diff@4, R,C]
+:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
+:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
+:~ not choose(D,D), dim(D). [1@6, D]
+%:~ not choose(D,0), dim(D). [1@6, D]
 
 % ==== (2) Effettuare una previsione della matrice all iterazione successiva
 % ====     e scegliere una cella tale per cui, alla prossima iterazione,
@@ -77,5 +82,16 @@ maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
 :~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighb(N). [1@1, R,C]
 
 
-#show nextCell/3.
+% ==== Preferisco accorpare celle con valori piu bassi
+:~ choose(R,C), cell(R,C,V). [V@5,R,C,V]
+
+
+
+% ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
+% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore è diverso da quello scelto e da V+1
+%allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
+%allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
+%:~choose(R,C),cell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
+
 #show choose/2.
+#show nextCell/3.

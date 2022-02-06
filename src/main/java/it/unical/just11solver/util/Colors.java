@@ -45,7 +45,7 @@ public class Colors {
 
 	/* Background and Font color for value 10 */
 	private static String BG10 = "#fdf76d"; // YELLOW
-	private static String FC10 = "#b4471e"; // BORDEAUX
+	private static String FC10 = "#aa5114"; // BORDEAUX
 
 	/* Background and Font color for value 11 */
 	private static String BG11 = "#047bfd"; // BLUE

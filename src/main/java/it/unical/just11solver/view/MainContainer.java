@@ -32,6 +32,7 @@ public class MainContainer extends BorderPane {
 			System.out.println();
 		}
 		System.out.println("_______________");
+		Matrix.getInstance().setCurrentMax(3);
 		Matrix.getInstance().update(newCellViews);
 		setBottom(Footer.getInstance());
 		setStyle();
@@ -39,6 +40,11 @@ public class MainContainer extends BorderPane {
 	
 	public void setStyle() {
 		getStyleClass().add("just11-main-container");
+	}
+
+	public void reset() {
+		instance = null;
+		instance = new MainContainer();
 	}
 	
 }

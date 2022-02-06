@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import it.unical.just11solver.model.Cell;
 import it.unical.just11solver.model.Choose;
 import it.unical.just11solver.model.NextCell;
+import it.unical.just11solver.model.Orientation;
 import it.unical.just11solver.view.CellView;
 import it.unical.just11solver.view.MainContainer;
 import it.unical.just11solver.view.Matrix;
@@ -28,6 +29,8 @@ import javafx.util.Duration;
 
 public class App extends Application {
 
+	private static boolean stop = false;
+	private static String currentOrientation = "dx";
 	private static String encodingResource = "encodings/just11";
 	private static Handler handler;
 
@@ -44,6 +47,7 @@ public class App extends Application {
 		ASPMapper.getInstance().registerClass(Cell.class);
 		ASPMapper.getInstance().registerClass(NextCell.class);
 		ASPMapper.getInstance().registerClass(Choose.class);
+		ASPMapper.getInstance().registerClass(Orientation.class);
 
 		Scene scene = new Scene(MainContainer.getInstance(), 400, 400);
 		scene.getStylesheets().add(getClass().getResource("/application/css/style.css").toExternalForm());
@@ -57,59 +61,77 @@ public class App extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				
-				InputProgram facts = new ASPInputProgram();
-				for (CellView[] cellViews : Matrix.getInstance().getCellViews()) {
-					for (CellView cell : cellViews) {
+				if (stop) {
+					MainContainer.getInstance().reset();
+					scene.setRoot(MainContainer.getInstance());
+					stop = false;
+				}
+
+				if (!stop) {
+					InputProgram facts = new ASPInputProgram();
+					for (CellView[] cellViews : Matrix.getInstance().getCellViews()) {
+						for (CellView cell : cellViews) {
+							try {
+								facts.addObjectInput(cell.getCellModel());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+
+					//currentOrientation = currentOrientation.equals("dx") ? "sx" : "dx";
+					try {
+						facts.addObjectInput(new Orientation(currentOrientation));
+					} catch (Exception e1) {
+						System.out.println("ERROR with orientation.");
+						e1.printStackTrace();
+					}
+
+					handler.removeAll();
+					handler.addProgram(facts);
+
+					InputProgram encoding = new ASPInputProgram();
+					encoding.addFilesPath(encodingResource);
+
+					handler.addProgram(encoding);
+
+					Output o = handler.startSync();
+
+					AnswerSets answerSets = (AnswerSets) o;
+					AnswerSet optimum = new AnswerSet(null);
+					try {
+						optimum = answerSets.getOptimalAnswerSets().get(0);
+						System.out.println("\nOttimo ----> " + optimum.toString());
+
+						CellView[][] newCellViews = new CellView[5][5];
 						try {
-							facts.addObjectInput(cell.getCellModel());
-						} catch (Exception e) {
+							for (Object obj : optimum.getAtoms()) {
+								if (obj instanceof NextCell) {
+									NextCell nextCell = (NextCell) obj;
+									if (nextCell.getValue() == 11) {
+										System.out.println("FINE!!!!");
+										// System.exit(1);
+										stop = true;
+
+									}
+									Cell newCell = new Cell(nextCell);
+									CellView newCellView = new CellView(newCell);
+									newCellViews[newCell.getRow()][newCell.getColumn()] = newCellView;
+								}
+							}
+							Matrix.getInstance().update(newCellViews);
+						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+								| NoSuchMethodException | SecurityException | InstantiationException e) {
+							System.out.println("ERROR");
 							e.printStackTrace();
 						}
+					} catch (Exception e) {
+						System.out.println("NO MOVES!!!!");
+						stop = true;
 					}
+
 				}
 
-				handler.removeAll();
-				handler.addProgram(facts);
-
-				InputProgram encoding = new ASPInputProgram();
-				encoding.addFilesPath(encodingResource);
-
-				handler.addProgram(encoding);
-
-				Output o = handler.startSync();
-
-				AnswerSets answerSets = (AnswerSets) o;
-				AnswerSet optimum = new AnswerSet(null);
-				try {
-					optimum = answerSets.getOptimalAnswerSets().get(0);
-				} catch (Exception e) {
-					System.out.println("NO MOVES!!!!");
-					//event.consume();
-					System.exit(1);
-				}
-				System.out.println("\nOttimo ----> " + optimum.toString());
-
-				CellView[][] newCellViews = new CellView[5][5];
-				try {
-					for (Object obj : optimum.getAtoms()) {
-						if (obj instanceof NextCell) {
-							NextCell nextCell = (NextCell) obj;
-							if (nextCell.getValue() == 11) {
-								System.out.println("FINE!!!!");
-								System.exit(1);
-							}
-							Cell newCell = new Cell(nextCell);
-							CellView newCellView = new CellView(newCell);
-							newCellViews[newCell.getRow()][newCell.getColumn()] = newCellView;
-						}
-					}
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException | InstantiationException e) {
-					System.out.println("ERROR");
-					e.printStackTrace();
-				}
-
-				Matrix.getInstance().update(newCellViews);
 			}
 
 		}));
