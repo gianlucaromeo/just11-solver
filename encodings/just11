@@ -51,14 +51,14 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 
 % ==== Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
 % ==== PROBLEMA: Non funziona se non abbiamo la matrice delliterazione successiva
-%nextNeigh(R1,C):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
-%nextNeigh(R,C1):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
-%numbOfNextNeigh(N):- #count{ R,C : nextNeigh(R,C)}=N.
-%:~ numbOfNextNeigh(N). [25-N@2]
+nextNeigh(R1,C):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
+nextNeigh(R,C1):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
+numbOfNextNeigh(N):- #count{ R,C : nextNeigh(R,C)}=N.
+:~ numbOfNextNeigh(N). [25-N@6]
 
 
 % ==== (1) Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
-%:~ choose(R,C), dim(D), Diff = D-R. [Diff@4, R,C]
+:~ choose(R,C), dim(D), Diff = D-R. [Diff@5, R,C]
 %:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
 %:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
 %:~ not choose(D,D), dim(D). [1@6, D]
@@ -88,10 +88,10 @@ maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
 
 
 % ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
-% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore è diverso da quello scelto e da V+1
-%allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
-%allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
-%:~choose(R,C),cell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
+% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore ï¿½ diverso da quello scelto e da V+1
+allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, cell(R, C, V), cell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
+allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, cell(R, C, V), cell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
+:~choose(R,C),cell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@6, R,C,V,R1,C1,V2]
 
 #show choose/2.
 #show nextCell/3.

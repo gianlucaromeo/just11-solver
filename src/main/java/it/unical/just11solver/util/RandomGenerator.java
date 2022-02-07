@@ -11,7 +11,7 @@ public class RandomGenerator {
 		if (max < 5) {			
 			return random.nextInt((max - min) + 1) + min;
 		} else {
-			return random.nextInt((max-1 - min) + 1) + min;			
+			return random.nextInt((max-2 - min) + 1) + min;			
 		}
 	}
 	

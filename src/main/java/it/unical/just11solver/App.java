@@ -42,7 +42,7 @@ public class App extends Application {
 	public void start(Stage stage) throws Exception {
 
 		// cambiare su windows/linux
-		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
+		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2Linux"));
 
 		ASPMapper.getInstance().registerClass(Cell.class);
 		ASPMapper.getInstance().registerClass(NextCell.class);
@@ -56,7 +56,7 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(400), new EventHandler<ActionEvent>() {
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
