@@ -28,6 +28,14 @@
 
 }
 
+.just11-cell-clicked {
+	-fx-scale-x: 0.7;
+    -fx-scale-y: 0.7;
+    -fx-scale-z: 0.7;
+	-fx-border-width: 4;
+	-fx-border-color: #313131;
+}
+
 /* The matrix */
 .just11-cells-container {
 	-fx-background-color: #fff;
@@ -52,4 +60,11 @@
 	-fx-text-fill: white;
 	-fx-font-weight: bold;
 	-fx-font-size: 12px;
+}
+
+.play-stop-btn {
+	-fx-background-color: rgb(69, 157, 254); /* BLUE */
+	-fx-background-radius: 7 7 7 7;
+	-fx-border-radius: 7 7 7 7;
+	-fx-text-fill: #fff;
 }

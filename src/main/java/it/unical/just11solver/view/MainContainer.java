@@ -35,6 +35,7 @@ public class MainContainer extends BorderPane {
 		Matrix.getInstance().setCurrentMax(3);
 		Matrix.getInstance().update(newCellViews);
 		setBottom(Footer.getInstance());
+		setTop(PlayStopButton.getInstance());
 		setStyle();
 	}
 	

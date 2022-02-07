@@ -16,6 +16,7 @@ public class CellView extends Button implements EventHandler<MouseEvent>{
 	public void handle(MouseEvent event) {
 		Matrix.getInstance().onClick(this);
 		System.out.println("Clicked on " + cellModel.toString());
+		getStyleClass().add("just11-cell-clicked");
 	}
 	
 	public CellView(Cell cellModel) {
@@ -30,6 +31,7 @@ public class CellView extends Button implements EventHandler<MouseEvent>{
 	}
 	
 	public void setStyle() {
+		getStyleClass().remove("just11-cell-clicked");
 		if (cellModel.getValue() > 0) {			
 			Pair colors = Colors.colors.get(cellModel.getValue());
 			String backgroundColor = colors.getBackgroundColor();

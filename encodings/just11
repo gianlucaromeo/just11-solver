@@ -58,10 +58,10 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 
 
 % ==== (1) Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
-:~ choose(R,C), dim(D), Diff = D-R. [Diff@4, R,C]
-:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
-:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
-:~ not choose(D,D), dim(D). [1@6, D]
+%:~ choose(R,C), dim(D), Diff = D-R. [Diff@4, R,C]
+%:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
+%:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
+%:~ not choose(D,D), dim(D). [1@6, D]
 %:~ not choose(D,0), dim(D). [1@6, D]
 
 % ==== (2) Effettuare una previsione della matrice all iterazione successiva

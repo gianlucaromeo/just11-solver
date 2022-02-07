@@ -56,7 +56,7 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(700), new EventHandler<ActionEvent>() {
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(400), new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -104,18 +104,29 @@ public class App extends Application {
 						System.out.println("\nOttimo ----> " + optimum.toString());
 
 						CellView[][] newCellViews = new CellView[5][5];
+						Choose choose = null;
 						try {
 							for (Object obj : optimum.getAtoms()) {
+								if (obj instanceof Choose) {
+									choose = (Choose) obj;
+								}
 								if (obj instanceof NextCell) {
 									NextCell nextCell = (NextCell) obj;
 									if (nextCell.getValue() == 11) {
 										System.out.println("FINE!!!!");
-										// System.exit(1);
 										stop = true;
 
 									}
 									Cell newCell = new Cell(nextCell);
 									CellView newCellView = new CellView(newCell);
+									if (choose != null) {
+										//System.out.println("Choose: " + choose.toString());
+										if (newCell.getRow() == choose.getRow() && 
+											choose.getColumn() == newCell.getColumn()) {
+											//System.out.println("Hello");
+											//newCellView.handle(null);
+										}
+									}
 									newCellViews[newCell.getRow()][newCell.getColumn()] = newCellView;
 								}
 							}

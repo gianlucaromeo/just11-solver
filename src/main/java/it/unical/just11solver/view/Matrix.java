@@ -16,6 +16,7 @@ public class Matrix extends GridPane {
 	public void update(CellView[][] newMatrix) {
 
 		m = newMatrix;
+		getChildren().clear();
 		moveToBottom();
 		
 		System.out.println("\n\nNew (After moveToBottom())");
