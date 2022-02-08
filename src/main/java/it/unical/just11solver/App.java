@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import it.unical.just11solver.model.Cell;
 import it.unical.just11solver.model.Choose;
+import it.unical.just11solver.model.NewMatrix;
 import it.unical.just11solver.model.NextCell;
 import it.unical.just11solver.model.Orientation;
 import it.unical.just11solver.view.CellView;
@@ -42,12 +43,13 @@ public class App extends Application {
 	public void start(Stage stage) throws Exception {
 
 		// cambiare su windows/linux
-		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2Linux"));
+		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2.exe"));
 
 		ASPMapper.getInstance().registerClass(Cell.class);
 		ASPMapper.getInstance().registerClass(NextCell.class);
 		ASPMapper.getInstance().registerClass(Choose.class);
 		ASPMapper.getInstance().registerClass(Orientation.class);
+		ASPMapper.getInstance().registerClass(NewMatrix.class);
 
 		Scene scene = new Scene(MainContainer.getInstance(), 400, 400);
 		scene.getStylesheets().add(getClass().getResource("/application/css/style.css").toExternalForm());
@@ -56,7 +58,7 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(2000), new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -110,8 +112,8 @@ public class App extends Application {
 								if (obj instanceof Choose) {
 									choose = (Choose) obj;
 								}
-								if (obj instanceof NextCell) {
-									NextCell nextCell = (NextCell) obj;
+								if (obj instanceof NewMatrix) {
+									NewMatrix nextCell = (NewMatrix) obj;
 									if (nextCell.getValue() == 11) {
 										System.out.println("FINE!!!!");
 										stop = true;

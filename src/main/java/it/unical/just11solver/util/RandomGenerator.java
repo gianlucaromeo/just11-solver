@@ -8,7 +8,7 @@ public class RandomGenerator {
 	
 	public static int rand(int min, int max) {
 		
-		if (max < 5) {			
+		if (max < 4) {			
 			return random.nextInt((max - min) + 1) + min;
 		} else {
 			return random.nextInt((max-2 - min) + 1) + min;			

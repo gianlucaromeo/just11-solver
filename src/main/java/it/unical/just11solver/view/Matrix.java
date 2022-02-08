@@ -17,7 +17,7 @@ public class Matrix extends GridPane {
 
 		m = newMatrix;
 		getChildren().clear();
-		moveToBottom();
+		//moveToBottom();
 		
 		System.out.println("\n\nNew (After moveToBottom())");
 		

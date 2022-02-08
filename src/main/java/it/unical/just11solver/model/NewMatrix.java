@@ -3,30 +3,25 @@ package it.unical.just11solver.model;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("cell")
-public class Cell {
-
+@Id("newMatrix")
+public class NewMatrix {
+	
 	@Param(0)
 	private int row;
-	
+
 	@Param(1)
 	private int column;
-	
+
 	@Param(2)
 	private int value;
 
-	public Cell(int r, int c, int v) {
+	public NewMatrix(int r, int c, int v) {
 		this.row = r;
 		this.column = c;
 		this.value = v;
 	}
 
-	public Cell() {}
-
-	public Cell(NewMatrix newCell) {
-		this.row = newCell.getRow();
-		this.column = newCell.getColumn();
-		this.value = newCell.getValue();
+	public NewMatrix() {
 	}
 
 	public int getRow() {
@@ -52,10 +47,10 @@ public class Cell {
 	public void setValue(int value) {
 		this.value = value;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "(" + row + ", " + column + ", val: " + value + ")";
+		return "[new matrix](" + row + ", " + column + ", val: " + value + ")";
 	}
-
+	
 }
