@@ -28,7 +28,7 @@ public class Matrix extends GridPane {
 				Cell cell = m[r][c].getCellModel();
 				
 				if (cell.getValue() == 0) {
-					m[r][c].update(0); //RandomGenerator.rand(1, currentMax)
+					m[r][c].update(RandomGenerator.rand(1, currentMax)); 
 				}
 				
 				add(m[r][c], cell.getColumn(), cell.getRow());
