@@ -80,7 +80,7 @@ numbOfNextNeigh(N):- #count{R,C : nextNeigh(R,C)}=N.
 % ==== (@4 e @3) Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
 %:~ choose(R,C), dim(D), Diff = D-R. [Diff@6, R,C]
 
-%:~ choose(R,C), dim(D), Diff = D-C. [Diff@6, R,C] % DESTRA
+%:~ choose(R,C), dim(D), Diff = D-C. [Diff@5, R,C] % DESTRA
 %:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
 %:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
 %:~ not choose(D,D), dim(D). [1@3, D]
