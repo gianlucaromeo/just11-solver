@@ -73,6 +73,21 @@ nextNeigh(R,C1) :- newMatrixChoose(R,C), C != C1, newMatrix(R, C, V), newMatrix(
 numbOfNextNeigh(N):- #count{R,C : nextNeigh(R,C)}=N.
 :~ numbOfNextNeigh(N). [25-N@6]
 
+
+%=================================================================== 
+
+% ==== Vicino sopra o sotto della nuova matrice
+newNeighborhoors(R1, C, R2, C) :- R1 != R2, newMatrix(R1, C, V), newMatrix(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
+
+% ==== Vicino destra o sinistra della nuova matrice
+newNeighborhoors(R, C1, R, C2) :- C1 != C2, newMatrix(R, C1, V), newMatrix(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
+
+:~ newMatrix(R,C,V),  not newNeighborhoors(R,C,_,_), V!=0. [11-V@7, R,C,V]
+
+
+
+%===================================================================
+
 % ==== (@5) Preferisco accorpare celle con valori piu bassi
 :~ choose(R,C), cell(R,C,V). [V@5,R,C,V]
 
