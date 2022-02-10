@@ -58,7 +58,7 @@ public class App extends Application {
 		stage.setResizable(false);
 		stage.show();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(200), new EventHandler<ActionEvent>() {
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(500), new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -68,7 +68,6 @@ public class App extends Application {
 					scene.setRoot(MainContainer.getInstance());
 					stop = false;
 				}
-
 				if (!stop) {
 					InputProgram facts = new ASPInputProgram();
 					for (CellView[] cellViews : Matrix.getInstance().getCellViews()) {
@@ -140,6 +139,7 @@ public class App extends Application {
 						}
 					} catch (Exception e) {
 						System.out.println("NO MOVES!!!!");
+						System.exit(0);
 						stop = true;
 					}
 

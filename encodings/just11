@@ -81,8 +81,9 @@ newNeighborhoors(R1, C, R2, C) :- R1 != R2, newMatrix(R1, C, V), newMatrix(R2, C
 
 % ==== Vicino destra o sinistra della nuova matrice
 newNeighborhoors(R, C1, R, C2) :- C1 != C2, newMatrix(R, C1, V), newMatrix(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
-
-:~ newMatrix(R,C,V), newMatrix(R1,C1,V1),  not sameCell(R,C,R1,C1), not newNeighborhoors(R,C,R1,C1), V!=0. [11-V@7, R,C,V]
+numbOfNewNeigh(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newMatrix(R,C,_).
+:~ newMatrix(R,C,V), numbOfNewNeigh(R,C,N), N=0. [11-V@8, R,C,V,N]
+:~ newMatrix(R,C,V), newMatrix(R1,C1,V1),  not sameCell(R,C,R1,C1), newNeighborhoors(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
 
 
 
