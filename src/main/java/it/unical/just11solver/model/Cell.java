@@ -23,7 +23,7 @@ public class Cell {
 
 	public Cell() {}
 
-	public Cell(NewMatrix newCell) {
+	public Cell(NewCell newCell) {
 		this.row = newCell.getRow();
 		this.column = newCell.getColumn();
 		this.value = newCell.getValue();

@@ -8,7 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
 
-public class CellView extends Button implements EventHandler<MouseEvent>{
+public class UICell extends Button implements EventHandler<MouseEvent>{
 
 	private Cell cellModel;
 	
@@ -19,7 +19,7 @@ public class CellView extends Button implements EventHandler<MouseEvent>{
 		getStyleClass().add("just11-cell-clicked");
 	}
 	
-	public CellView(Cell cellModel) {
+	public UICell(Cell cellModel) {
 		this.cellModel = cellModel;
 		setText("" + cellModel.getValue());
 		setOnMouseClicked(this);

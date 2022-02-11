@@ -4,7 +4,7 @@ import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
 @Id("nextCell")
-public class NextCell {
+public class NewCellBeforeMove {
 
 	@Param(0)
 	private int row;
@@ -15,13 +15,13 @@ public class NextCell {
 	@Param(2)
 	private int value;
 
-	public NextCell(int r, int c, int v) {
+	public NewCellBeforeMove(int r, int c, int v) {
 		this.row = r;
 		this.column = c;
 		this.value = v;
 	}
 
-	public NextCell() {}
+	public NewCellBeforeMove() {}
 
 	public int getRow() {
 		return row;

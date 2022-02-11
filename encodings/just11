@@ -5,13 +5,14 @@ dim(4).
 
 
 % ===================================== GUESS ===================================== %
-% ==== Scegliamo UNA sola cella
+
+% Scegliamo, se possibile, esattamente una cella su cui cliccare
 choose(R, C) | noChoose(R, C) :- cell(R, C, _).
 :- #count{R,C : choose(R, C)} != 1. % ==== Se non ci sono mosse diventa INCONSISTENTE
-:- choose(R,C), not has_neighborhoors(R,C).
-has_neighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
+:- choose(R,C), not hasNeighborhoors(R,C).
+hasNeighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
 
-:- cell(D,D-1,V), cell(D,D,V+1), dim(D), has_neighborhoors(D,D-1), not choose(D,D-1).
+:- cell(D,D-1,V), cell(D,D,V+1), dim(D), hasNeighborhoors(D,D-1), not choose(D,D-1).
 
 
 % ===================================== VICINATO ===================================== %
@@ -19,7 +20,7 @@ has_neighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
 % ====   - hanno stesso valore;
 % ====   - le loro celle differisicono di una sola posizione (riga o colonna).
 
-% ==== Utilitï¿½: Celle uguali con se stesse
+% ==== Utilit�: Celle uguali con se stesse
 sameCell(R, C, R, C) :- cell(R, C, V).
 
 % ==== Vicino sopra o sotto
@@ -46,44 +47,43 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 
 % ==================================== NEW MATRIX! ================================== %
 
-newColumnSortedByRow(R,C,V) :- nextCell(R,C,V), V != 0.
-newColumnSortedByRow(R,C,V) :- nextCell(R1,C,V), V=0, R = 0-R1.
+% ==== La nuova matrice, senza "gravit� verso il basso"
+newCellBeforeMove(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
+newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, neighborhoors(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
+newCellBeforeMove(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighborhoors(R1,C1,R,C). % ==== Copio celle non modificate
 
-newMatrix(R,C,V) :- newColumnSortedByRow(R1,C,V), V!=0,
+newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R,C,V), V != 0.
+newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R1,C,V), V=0, R = 0-R1.
+
+newCell(R,C,V) :- newColumnSortedByRow(R1,C,V), V!=0,
                     R = #count{R2 : newColumnSortedByRow(R2,C,V2), R1 > R2}.
                     
-newMatrix(R,C,0) :- newColumnSortedByRow(R1,C,0),
+newCell(R,C,0) :- newColumnSortedByRow(R1,C,0),
                     R = #count{R2 : newColumnSortedByRow(R2,C,0), R1 > R2}.
                     
 newMatrixChoose(R,C) :- choose(R1,C), R = #count{R2 : newColumnSortedByRow(R2,C,V2), R1 > R2}.
 
-% ==== Effettuare una previsione della matrice all iterazione successiva
-% ====     e scegliere una cella tale per cui, alla prossima iterazione,
-% ====     massimizziamo il numero di scelte a disposizione (basandoci su cosa sappiamo).
-nextCell(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
-nextCell(R, C, V) :- choose(R1, C1), V = 0, neighborhoors(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
-nextCell(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighborhoors(R1,C1,R,C). % ==== Copio celle non modificate
 
 % ===================================== WEAK CONSTRAINTS ===================================== %
 
 
 % ==== (@6) Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
-nextNeigh(R1,C) :- newMatrixChoose(R,C), R != R1, newMatrix(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
-nextNeigh(R,C1) :- newMatrixChoose(R,C), C != C1, newMatrix(R, C, V), newMatrix(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
-numbOfNextNeigh(N):- #count{R,C : nextNeigh(R,C)}=N.
-:~ numbOfNextNeigh(N). [25-N@6]
+newDirectNeighborhoors(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
+newDirectNeighborhoors(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
+newNumbOfDirectNeighborhoors(N):- #count{R,C : newDirectNeighborhoors(R,C)}=N.
+:~ newNumbOfDirectNeighborhoors(N). [25-N@6]
 
 
 %=================================================================== 
 
 % ==== Vicino sopra o sotto della nuova matrice
-newNeighborhoors(R1, C, R2, C) :- R1 != R2, newMatrix(R1, C, V), newMatrix(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
+newNeighborhoors(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V), newCell(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
 
 % ==== Vicino destra o sinistra della nuova matrice
-newNeighborhoors(R, C1, R, C2) :- C1 != C2, newMatrix(R, C1, V), newMatrix(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
-numbOfNewNeigh(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newMatrix(R,C,_).
-:~ newMatrix(R,C,V), numbOfNewNeigh(R,C,N), N=0. [11-V@8, R,C,V,N]
-:~ newMatrix(R,C,V), newMatrix(R1,C1,V1),  not sameCell(R,C,R1,C1), newNeighborhoors(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
+newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V), newCell(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
+newNumbOfNewNeighborhoors(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newCell(R,C,_).
+:~ newCell(R,C,V), newNumbOfNewNeighborhoors(R,C,N), N=0. [11-V@8, R,C,V,N]
+:~ newCell(R,C,V), newCell(R1,C1,V1),  not sameCell(R,C,R1,C1), newNeighborhoors(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
 
 
 
@@ -103,15 +103,15 @@ numbOfNewNeigh(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newMat
 %:~ not choose(D,0), dim(D). [1@6, D]
 
 % ==== (4) Preferenza celle con maggior numero di vicini
-maxNumbOfNeighb(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
-:~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighb(N). [1@2, R,C]
+maxNumbOfNeighborhoors(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
+:~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighborhoors(N). [1@2, R,C]
 
 
 % ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
-% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore è diverso da quello scelto e da V+1
-%allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, newMatrix(R, C, V), newMatrix(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
-%allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, newMatrix(R, C, V), newMatrix(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
-%:~choose(R,C),newMatrix(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
+% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore � diverso da quello scelto e da V+1
+%allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, newCell(R, C, V), newCell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
+%allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
+%:~choose(R,C),newCell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
 
 #show choose/2.
-#show newMatrix/3.
+#show newCell/3.

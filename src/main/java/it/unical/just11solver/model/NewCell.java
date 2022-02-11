@@ -4,7 +4,7 @@ import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
 @Id("newMatrix")
-public class NewMatrix {
+public class NewCell {
 	
 	@Param(0)
 	private int row;
@@ -15,13 +15,13 @@ public class NewMatrix {
 	@Param(2)
 	private int value;
 
-	public NewMatrix(int r, int c, int v) {
+	public NewCell(int r, int c, int v) {
 		this.row = r;
 		this.column = c;
 		this.value = v;
 	}
 
-	public NewMatrix() {
+	public NewCell() {
 	}
 
 	public int getRow() {
