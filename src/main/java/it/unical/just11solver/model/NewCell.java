@@ -3,7 +3,7 @@ package it.unical.just11solver.model;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("newMatrix")
+@Id("newCell")
 public class NewCell {
 	
 	@Param(0)
@@ -50,7 +50,7 @@ public class NewCell {
 
 	@Override
 	public String toString() {
-		return "[new matrix](" + row + ", " + column + ", val: " + value + ")";
+		return "[new cell](" + row + ", " + column + ", val: " + value + ")";
 	}
 	
 }

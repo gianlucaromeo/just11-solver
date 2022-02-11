@@ -51,7 +51,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 
 		initScene(stage);
 
-		createHandler(HandlerType.WINDOWS);
+		createHandler(HandlerType.LINUX);
 		registerClasses();
 
 		Timeline t = new Timeline(new KeyFrame(Duration.millis(500), this));
@@ -80,6 +80,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 			try {
 
 				optimal = answerSets.getOptimalAnswerSets().get(0);
+
 				System.out.println("Found Optimal : " + optimal.toString());
 
 				UICell[][] newCellViews = new UICell[Settings.MATRIX_SIZE][Settings.MATRIX_SIZE];
@@ -112,7 +113,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 				}
 			} catch (Exception e) {
 				System.out.println("No moves left. AI loose!");
-				e.printStackTrace();
+				//e.printStackTrace();
 				stop = true;
 			}
 
