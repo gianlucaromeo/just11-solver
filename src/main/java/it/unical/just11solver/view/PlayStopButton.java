@@ -18,7 +18,7 @@ public class PlayStopButton extends Button implements EventHandler<MouseEvent> {
 	
 	@Override
 	public void handle(MouseEvent event) {
-		//App.next();
+		App.next();
 	}
 	
 	private PlayStopButton() {
@@ -29,7 +29,7 @@ public class PlayStopButton extends Button implements EventHandler<MouseEvent> {
 	
 	private void setStyle() {
 		getStyleClass().add("play-stop-btn");
-		setDisable(true);
+		//setDisable(true);
 	}
 	
 }

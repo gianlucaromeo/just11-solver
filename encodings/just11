@@ -47,7 +47,7 @@ numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(
 
 % ==================================== NEW MATRIX! ================================== %
 
-% ==== La nuova matrice, senza "gravità verso il basso"
+% ==== La nuova matrice, senza "gravitï¿½ verso il basso"
 newCellBeforeMove(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
 newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, neighborhoors(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
 newCellBeforeMove(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighborhoors(R1,C1,R,C). % ==== Copio celle non modificate
@@ -81,13 +81,41 @@ newNeighborhoors(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V), newCell(R2, C, V)
 
 % ==== Vicino destra o sinistra della nuova matrice
 newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V), newCell(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
-newNumbOfNewNeighborhoors(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newCell(R,C,_).
-:~ newCell(R,C,V), newNumbOfNewNeighborhoors(R,C,N), N=0. [11-V@8, R,C,V,N]
+numbOfNewNeighborhoors(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newCell(R,C,_).
+:~ newCell(R,C,V), numbOfNewNeighborhoors(R,C,N), N=0. [11-V@8, R,C,V,N]
 :~ newCell(R,C,V), newCell(R1,C1,V1),  not sameCell(R,C,R1,C1), newNeighborhoors(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
 
 
 
 %===================================================================
+%=========== data la matrice futura la strategia cambia quando posso accoppiare celle alte (>= 7)
+
+:~ newCell(R,C,V), numbOfNewNeighborhoors(R,C,N), N=0. [1@V, R,C,V,N]
+
+%valoreSimile(R1, C1, R2, C2, Diff):- x(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
+%minValoreSimile(R1, C1, Min):- #min{ Diff:  valoreSimile(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
+
+%:~newCell(R,C,V), minValoreSimile(R,C,Min). [Min@7+V, R,C,V,Min]
+
+
+
+% ==== Vicino sopra o sotto
+x(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V1), newCell(R2, C, V2), &abs(R1-R2; Diff), Diff = 1.
+
+% ==== Vicino destra o sinistra
+x(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V1), newCell(R, C2, V2), &abs(C1-C2; Diff), Diff = 1.
+
+x(R1, C1, R3, C3) :- newCell(R1, C1, V1), newCell(R2, C2, V2), newCell(R3, C3, V3),
+                                 not sameCell(R1, C1, R2, C2), 
+                                 not sameCell(R1, C1, R3, C3),
+                                 not sameCell(R2, C2, R3, C3),
+                                 x(R1, C1, R2, C2),
+                                 x(R2, C2, R3, C3).
+
+
+
+
+
 
 % ==== (@5) Preferisco accorpare celle con valori piu bassi
 :~ choose(R,C), cell(R,C,V). [V@5,R,C,V]
@@ -108,7 +136,7 @@ maxNumbOfNeighborhoors(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
 
 
 % ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
-% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore è diverso da quello scelto e da V+1
+% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore ï¿½ diverso da quello scelto e da V+1
 %allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, newCell(R, C, V), newCell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
 %allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
 %:~choose(R,C),newCell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
