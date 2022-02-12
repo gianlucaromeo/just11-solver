@@ -68,22 +68,22 @@ newMatrixChoose(R,C) :- choose(R1,C), R = #count{R2 : newColumnSortedByRow(R2,C,
 
 
 % ==== (@6) Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
-newDirectNeighborhoors(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
-newDirectNeighborhoors(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
-newNumbOfDirectNeighborhoors(N):- #count{R,C : newDirectNeighborhoors(R,C)}=N.
-:~ newNumbOfDirectNeighborhoors(N). [25-N@6]
+newDirectCouple(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
+newDirectCouple(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
+newNumbOfDirectCouple(N):- #count{R,C : newDirectCouple(R,C)}=N.
+:~ newNumbOfDirectCouple(N). [25-N@6]
 
 
 %=================================================================== 
 
 % ==== Vicino sopra o sotto della nuova matrice
-newNeighborhoors(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V), newCell(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
+newCouple(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V), newCell(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
 
 % ==== Vicino destra o sinistra della nuova matrice
-newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V), newCell(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
-numbOfNewNeighborhoors(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N, newCell(R,C,_).
-:~ newCell(R,C,V), numbOfNewNeighborhoors(R,C,N), N=0. [11-V@8, R,C,V,N]
-:~ newCell(R,C,V), newCell(R1,C1,V1),  not sameCell(R,C,R1,C1), newNeighborhoors(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
+newCouple(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V), newCell(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
+numbOfNewCouple(R,C,N):- #count{R1,C1 : newCouple(R, C, R1, C1)}=N, newCell(R,C,_).
+:~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [11-V@8, R,C,V,N]
+:~ newCell(R,C,V), newCell(R1,C1,V1),  not sameCell(R,C,R1,C1), newCouple(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
 
 
 
@@ -92,7 +92,7 @@ numbOfNewNeighborhoors(R,C,N):- #count{R1,C1 : newNeighborhoors(R, C, R1, C1)}=N
 
 :~ newCell(R,C,V), numbOfNewNeighborhoors(R,C,N), N=0. [1@V, R,C,V,N]
 
-valoreSimile(R1, C1, R2, C2, Diff):- x(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
+valoreSimile(R1, C1, R2, C2, Diff):- newNeighborhoors(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
 minValoreSimile(R1, C1, Min):- #min{ Diff:  valoreSimile(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
 
 :~newCell(R,C,V), minValoreSimile(R,C,Min). [Min@7+V, R,C,V,Min]
@@ -100,10 +100,10 @@ minValoreSimile(R1, C1, Min):- #min{ Diff:  valoreSimile(R1, C1, R2, C2, Diff)}=
 
 
 % ==== Vicino sopra o sotto
-x(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V1), newCell(R2, C, V2), &abs(R1-R2; Diff), Diff = 1.
+newNeighborhoors(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V1), newCell(R2, C, V2), &abs(R1-R2; Diff), Diff = 1.
 
 % ==== Vicino destra o sinistra
-x(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V1), newCell(R, C2, V2), &abs(C1-C2; Diff), Diff = 1.
+newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V1), newCell(R, C2, V2), &abs(C1-C2; Diff), Diff = 1.
 
 
 
