@@ -9,10 +9,10 @@ dim(4).
 % Scegliamo, se possibile, esattamente una cella su cui cliccare
 choose(R, C) | noChoose(R, C) :- cell(R, C, _).
 :- #count{R,C : choose(R, C)} != 1. % ==== Se non ci sono mosse diventa INCONSISTENTE
-:- choose(R,C), not hasNeighborhoors(R,C).
-hasNeighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
+:- choose(R,C), not isCouple(R,C).
+isCouple(R,C) :- cell(R, C, V), couple(R,C,_,_).
 
-:- cell(D,D-1,V), cell(D,D,V+1), dim(D), hasNeighborhoors(D,D-1), not choose(D,D-1).
+:- cell(D,D-1,V), cell(D,D,V+1), dim(D), isCouple(D,D-1), not choose(D,D-1).
 
 
 % ===================================== VICINATO ===================================== %
@@ -24,33 +24,33 @@ hasNeighborhoors(R,C) :- cell(R, C, V), neighborhoors(R,C,_,_).
 sameCell(R, C, R, C) :- cell(R, C, V).
 
 % ==== Vicino sopra o sotto
-neighborhoors(R1, C, R2, C) :- R1 != R2, cell(R1, C, V), cell(R2, C, V), &abs(R1-R2; Diff), Diff = 1.
+couple(R1, C, R2, C) :- R1 != R2, cell(R1, C, V), cell(R2, C, V), &abs(R1-R2; Diff), Diff = 1.
 
 % ==== Vicino destra o sinistra
-neighborhoors(R, C1, R, C2) :- C1 != C2, cell(R, C1, V), cell(R, C2, V), &abs(C1-C2; Diff), Diff = 1.
+couple(R, C1, R, C2) :- C1 != C2, cell(R, C1, V), cell(R, C2, V), &abs(C1-C2; Diff), Diff = 1.
 
-neighborhoors(R1, C1, R3, C3) :- cell(R1, C1, V), cell(R2, C2, V), cell(R3, C3, V),
+couple(R1, C1, R3, C3) :- cell(R1, C1, V), cell(R2, C2, V), cell(R3, C3, V),
                                  not sameCell(R1, C1, R2, C2), 
                                  not sameCell(R1, C1, R3, C3),
                                  not sameCell(R2, C2, R3, C3),
-                                 neighborhoors(R1, C1, R2, C2),
-                                 neighborhoors(R2, C2, R3, C3).
+                                 couple(R1, C1, R2, C2),
+                                 couple(R2, C2, R3, C3).
 
 
 
 % ==== Per ogni cella (R,C), conto quanti vicini ha.
 % ==== NOTA: Se una cella ha N vicini, allora N celle avranno gli stessi N vicini
-numbOfNeighborhoors(R, C, N) :- cell(R, C, V), N = #count{R1, C1: neighborhoors(R, C, R1, C1)}.
+numbOfCouples(R, C, N) :- cell(R, C, V), N = #count{R1, C1: couple(R, C, R1, C1)}.
 
-%:- cell(R,C,V), numbOfNeighborhoors(R,C,N), N>6, not choose(R,C), N=#max{N2,R1,C1 : numbOfNeighborhoors(R1,C1,N2)}.
+%:- cell(R,C,V), numbOfCouples(R,C,N), N>6, not choose(R,C), N=#max{N2,R1,C1 : numbOfCouples(R1,C1,N2)}.
 
 
 % ==================================== NEW MATRIX! ================================== %
 
 % ==== La nuova matrice, senza "gravit� verso il basso"
 newCellBeforeMove(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
-newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, neighborhoors(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
-newCellBeforeMove(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not neighborhoors(R1,C1,R,C). % ==== Copio celle non modificate
+newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, couple(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
+newCellBeforeMove(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not couple(R1,C1,R,C). % ==== Copio celle non modificate
 
 newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R,C,V), V != 0.
 newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R1,C,V), V=0, R = 0-R1.
@@ -70,8 +70,8 @@ newMatrixChoose(R,C) :- choose(R1,C), R = #count{R2 : newColumnSortedByRow(R2,C,
 % ==== (@6) Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
 newDirectCouple(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
 newDirectCouple(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
-newNumbOfDirectCouple(N):- #count{R,C : newDirectCouple(R,C)}=N.
-:~ newNumbOfDirectCouple(N). [25-N@6]
+newNumbOfDirectNeighborhoors(N):- #count{R,C : newDirectCouple(R,C)}=N.
+:~ newNumbOfDirectNeighborhoors(N). [25-N@6]
 
 
 %=================================================================== 
@@ -90,12 +90,12 @@ numbOfNewCouple(R,C,N):- #count{R1,C1 : newCouple(R, C, R1, C1)}=N, newCell(R,C,
 %===================================================================
 %=========== data la matrice futura la strategia cambia quando posso accoppiare celle alte (>= 7)
 
-:~ newCell(R,C,V), numbOfNewNeighborhoors(R,C,N), N=0. [1@V, R,C,V,N]
+:~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [1@V, R,C,V,N]
 
-valoreSimile(R1, C1, R2, C2, Diff):- newNeighborhoors(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
-minValoreSimile(R1, C1, Min):- #min{ Diff:  valoreSimile(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
+diffBetweenNewCells(R1, C1, R2, C2, Diff):- newNeighborhoors(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
+minDiffBetweenNewCells(R1, C1, Min):- #min{ Diff:  diffBetweenNewCells(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
 
-:~newCell(R,C,V), minValoreSimile(R,C,Min). [Min@7+V, R,C,V,Min]
+:~newCell(R,C,V), minDiffBetweenNewCells(R,C,Min). [Min@7+V, R,C,V,Min]
 
 
 
@@ -124,8 +124,8 @@ newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V1), newCell(R, C2, V
 %:~ not choose(D,0), dim(D). [1@6, D]
 
 % ==== (4) Preferenza celle con maggior numero di vicini
-maxNumbOfNeighborhoors(M) :- M = #max{N: numbOfNeighborhoors(R, C, N)}.
-:~ choose(R, C), numbOfNeighborhoors(R, C, N), not maxNumbOfNeighborhoors(N). [1@2, R,C]
+maxNumbOfCouple(M) :- M = #max{N: numbOfCouples(R, C, N)}.
+:~ choose(R, C), numbOfCouples(R, C, N), not maxNumbOfCouple(N). [1@2, R,C]
 
 
 % ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
