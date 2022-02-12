@@ -27,6 +27,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -54,7 +55,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 		createHandler(HandlerType.LINUX);
 		registerClasses();
 
-		Timeline t = new Timeline(new KeyFrame(Duration.millis(5000), this));
+		Timeline t = new Timeline(new KeyFrame(Duration.millis(550), this));
 		t.setCycleCount(Timeline.INDEFINITE);
 		t.play();
 
@@ -63,78 +64,6 @@ public class App extends Application implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent event) {
 
-	} // end handle
-
-	private static void resetHandler(InputProgram facts) {
-
-		handler.removeAll();
-		handler.addProgram(facts);
-
-		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath(Settings.ENCODING_RESOURCE);
-
-		handler.addProgram(encoding);
-
-	}
-
-	@Deprecated
-	private static void setOrientationStrategy(InputProgram facts) {
-		currentOrientation = currentOrientation.equals("dx") ? "sx" : "dx";
-		try {
-			facts.addObjectInput(new Orientation(currentOrientation));
-		} catch (Exception e1) {
-			System.err.println(Settings.ORIENTATIONS_ERROR);
-			e1.printStackTrace();
-		}
-	}
-
-	private static void addFactsToProgram(InputProgram facts) {
-		for (UICell[] cellViews : Matrix.getInstance().getCellViews()) {
-			for (UICell cell : cellViews) {
-				try {
-					facts.addObjectInput(cell.getCellModel());
-				} catch (Exception e) {
-					System.err.println(Settings.ADD_FACTS_TO_PROGRAM_ERROR);
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private static void resetGame() {
-		MainContainer.getInstance().reset();
-		scene.setRoot(MainContainer.getInstance());
-		stop = false;
-	}
-
-	private void initScene(Stage stage) {
-		scene = new Scene(MainContainer.getInstance(), Settings.SCENE_WIDTH, Settings.SCENE_HEIGHT);
-		scene.getStylesheets().add(getClass().getResource(Settings.CSS_PATH).toExternalForm());
-		stage.setScene(scene);
-		stage.setResizable(Settings.RESIZABLE);
-		stage.show();
-	}
-
-	private void registerClasses() {
-		try {
-			ASPMapper.getInstance().registerClass(NewCellBeforeMove.class); // Currently not necessary
-			ASPMapper.getInstance().registerClass(Orientation.class); // Currently not necessary
-			ASPMapper.getInstance().registerClass(Cell.class);
-			ASPMapper.getInstance().registerClass(Choose.class);
-			ASPMapper.getInstance().registerClass(NewCell.class);
-		} catch (ObjectNotValidException | IllegalAnnotationException e) {
-			System.err.println(Settings.REGISTER_CLASS_ERROR);
-			e.printStackTrace();
-		}
-	}
-
-	private static void createHandler(HandlerType handlerType) {
-		String exe_path = handlerType == HandlerType.WINDOWS ? Settings.WINDOWS_EXE_PATH : Settings.LINUX_EXE_PATH;
-		handler = new DesktopHandler(new DLV2DesktopService(exe_path));
-	}
-
-	public static void next() {
-
 		if (stop) {
 			resetGame();
 		} else {
@@ -142,7 +71,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 			InputProgram facts = new ASPInputProgram();
 
 			addFactsToProgram(facts);
-			//setOrientationStrategy(facts);
+			setOrientationStrategy(facts);
 
 			resetHandler(facts);
 
@@ -191,6 +120,77 @@ public class App extends Application implements EventHandler<ActionEvent> {
 
 		}
 
+	} // end handle
+
+	private void resetHandler(InputProgram facts) {
+
+		handler.removeAll();
+		handler.addProgram(facts);
+
+		InputProgram encoding = new ASPInputProgram();
+		encoding.addFilesPath(Settings.ENCODING_RESOURCE);
+
+		handler.addProgram(encoding);
+
+	}
+
+	@Deprecated
+	private void setOrientationStrategy(InputProgram facts) {
+		currentOrientation = currentOrientation.equals("dx") ? "sx" : "dx";
+		try {
+			facts.addObjectInput(new Orientation(currentOrientation));
+		} catch (Exception e1) {
+			System.err.println(Settings.ORIENTATIONS_ERROR);
+			e1.printStackTrace();
+		}
+	}
+
+	private void addFactsToProgram(InputProgram facts) {
+		for (UICell[] cellViews : Matrix.getInstance().getCellViews()) {
+			for (UICell cell : cellViews) {
+				try {
+					facts.addObjectInput(cell.getCellModel());
+				} catch (Exception e) {
+					System.err.println(Settings.ADD_FACTS_TO_PROGRAM_ERROR);
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void resetGame() {
+		MainContainer.getInstance().reset();
+		scene.setRoot(MainContainer.getInstance());
+		stop = false;
+	}
+
+	private void initScene(Stage stage) {
+		scene = new Scene(MainContainer.getInstance(), Settings.SCENE_WIDTH, Settings.SCENE_HEIGHT);
+		scene.getStylesheets().add(getClass().getResource(Settings.CSS_PATH).toExternalForm());
+		stage.setScene(scene);
+		stage.setResizable(Settings.RESIZABLE);
+
+		stage.getIcons().add(new Image(Settings.ICON_URL));
+		
+		stage.show();
+	}
+
+	private void registerClasses() {
+		try {
+			ASPMapper.getInstance().registerClass(NewCellBeforeMove.class); // Currently not necessary
+			ASPMapper.getInstance().registerClass(Orientation.class); // Currently not necessary
+			ASPMapper.getInstance().registerClass(Cell.class);
+			ASPMapper.getInstance().registerClass(Choose.class);
+			ASPMapper.getInstance().registerClass(NewCell.class);
+		} catch (ObjectNotValidException | IllegalAnnotationException e) {
+			System.err.println(Settings.REGISTER_CLASS_ERROR);
+			e.printStackTrace();
+		}
+	}
+
+	private static void createHandler(HandlerType handlerType) {
+		String exe_path = handlerType == HandlerType.WINDOWS ? Settings.WINDOWS_EXE_PATH : Settings.LINUX_EXE_PATH;
+		handler = new DesktopHandler(new DLV2DesktopService(exe_path));
 	}
 
 } // end class
