@@ -93,13 +93,13 @@ newMatrixChoose(R,C) :- choose(R1,C), R = #count{R2 : newColumnSortedByRow(R2,C,
 
 
 
-% ==================================== [LIVELLO @7+V]
+% ==================================== [LIVELLO @8+V]
 % ==== Data una nuova cella, calcola, per ogni vicino diretto, la differenza tra i loro valori.
 % ==== Successivamente, trova il minimo tra queste differenze.
 % ==== Si preferisce minimizzare questa differenza.
 diffBetweenNewCells(R1, C1, R2, C2, Diff):- newCouple(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
 minDiffBetweenNewCells(R1, C1, Min):- #min{ Diff:  diffBetweenNewCells(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
-:~ newCell(R,C,V), minDiffBetweenNewCells(R,C,Min). [Min@7+V, R,C,V,Min]
+:~ newCell(R,C,V), minDiffBetweenNewCells(R,C,Min). [Min@4, R,C,V,Min]
 
 
 

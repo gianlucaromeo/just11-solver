@@ -18,7 +18,7 @@ public class Settings {
 	/* EMBASP */
 	public static final String ENCODING_RESOURCE = "encodings/just11";
 	public static final String LINUX_EXE_PATH = "lib/dlv2Linux";
-	public static final String WINDOWS_EXE_PATH = "lib/dlv2.exe";
+	public static final String WINDOWS_EXE_PATH = "lib/dlv2_windows_64.exe";
 	
 	/* CONSOLE ERRORS */
 	public static final String REGISTER_CLASS_ERROR = "[JUST_11_SOLVER][ERROR][registerClasses()]:";
