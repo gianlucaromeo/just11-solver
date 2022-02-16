@@ -1,138 +1,178 @@
-% ===================================== INPUT ===================================== %
-% matrice 5x5
-% cell(R, C, V).
+% ===================================== INPUT ======================================%
+% ==== Matrice 5x5
 dim(4).
+
+
 
 
 % ===================================== GUESS ===================================== %
 
-% Scegliamo, se possibile, esattamente una cella su cui cliccare
+% Scegliamo, se possibile, esattamente una cella su cui sia possibile cliccare
 choose(R, C) | noChoose(R, C) :- cell(R, C, _).
-:- #count{R,C : choose(R, C)} != 1. % ==== Se non ci sono mosse diventa INCONSISTENTE
+:- #count{R,C : choose(R, C)} != 1.
 :- choose(R,C), not isCouple(R,C).
 isCouple(R,C) :- cell(R, C, V), couple(R,C,_,_).
 
+% ==== Se la cella (4,3) forma una coppia con (4,4), è preferibile cliccare subito.
 :- cell(D,D-1,V), cell(D,D,V+1), dim(D), isCouple(D,D-1), not choose(D,D-1).
 
 
-% ===================================== VICINATO ===================================== %
-% ==== (R,C) e vicino di (R1,C1) se:
+
+
+% ===================================== COPPIE ===================================== %
+% ==== Due celle formano una "coppia" se:
 % ====   - hanno stesso valore;
 % ====   - le loro celle differisicono di una sola posizione (riga o colonna).
 
-% ==== Utilit�: Celle uguali con se stesse
+% ==== Utilita: Celle uguali con se stesse
 sameCell(R, C, R, C) :- cell(R, C, V).
 
-% ==== Vicino sopra o sotto
-couple(R1, C, R2, C) :- R1 != R2, cell(R1, C, V), cell(R2, C, V), &abs(R1-R2; Diff), Diff = 1.
+% ==== Coppia su una colonna
+couple(R1, C, R2, C) :- cell(R1, C, V), cell(R2, C, V), R1 != R2, &abs(R1-R2; Diff), Diff = 1.
 
-% ==== Vicino destra o sinistra
-couple(R, C1, R, C2) :- C1 != C2, cell(R, C1, V), cell(R, C2, V), &abs(C1-C2; Diff), Diff = 1.
+% ==== Coppia su una riga
+couple(R, C1, R, C2) :- cell(R, C1, V), cell(R, C2, V), C1 != C2, &abs(C1-C2; Diff), Diff = 1.
 
-couple(R1, C1, R3, C3) :- cell(R1, C1, V), cell(R2, C2, V), cell(R3, C3, V),
-                                 not sameCell(R1, C1, R2, C2), 
-                                 not sameCell(R1, C1, R3, C3),
-                                 not sameCell(R2, C2, R3, C3),
-                                 couple(R1, C1, R2, C2),
-                                 couple(R2, C2, R3, C3).
+% ==== Coppie (ricorsione)
+couple(R1, C1, R3, C3) :- cell(R1, C1, V), 
+                          cell(R2, C2, V), 
+                          cell(R3, C3, V),
+                          not sameCell(R1, C1, R2, C2), 
+                          not sameCell(R1, C1, R3, C3),
+                          not sameCell(R2, C2, R3, C3),
+                          couple(R1, C1, R2, C2),
+                          couple(R2, C2, R3, C3).
 
 
 
-% ==== Per ogni cella (R,C), conto quanti vicini ha.
-% ==== NOTA: Se una cella ha N vicini, allora N celle avranno gli stessi N vicini
+% ==== Per ogni cella (R,C), conta quante coppie forma.
+% ==== L insieme di queste coppie rappresenta un intero blocco di celle aventi stesso valore.
+% ==== Perciò, date 2 qualsiasi celle di un blocco, queste avranno lo stesso numero di coppie.
 numbOfCouples(R, C, N) :- cell(R, C, V), N = #count{R1, C1: couple(R, C, R1, C1)}.
 
-%:- cell(R,C,V), numbOfCouples(R,C,N), N>6, not choose(R,C), N=#max{N2,R1,C1 : numbOfCouples(R1,C1,N2)}.
 
 
-% ==================================== NEW MATRIX! ================================== %
 
-% ==== La nuova matrice, senza "gravit� verso il basso"
-newCellBeforeMove(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1.              % ==== Aggiorniamo cella scelta
-newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, couple(R1, C1, R, C).          % ==== Aggiorniamo celle vicine a quella scelta
+% ==================================== NEW MATRIX ================================== %
+
+% ==== Per effettuare una previsione di come sarà la nuova matrice se viene cliccata una cella,
+% ==== viene prima aggiornato a V+1 il valore V della cella cliccata.
+% ==== Successivamente, viene posto V=0 per ogni cella che formava una coppia con la cella scelta.
+% ==== Infine, viene effettuato un calcolo per muovere i valori V!=0 verso il basso.
+% ==== Così facendo, si ha una matrice M1 avente alcune celle con valore 0. I nuovi valori saranno
+% ==== calcolati casualmente alla prossima interazione, perciò non è dato sapere quali saranno.
+% ==== Tuttavia, con la nuova matrice, è possibile tenere in considerazioni nuovi fattori, come
+% ==== le nuove coppie che si formano.
+
+
+% ==== Le nuove celle della nuova matrice, SENZA "gravita verso il basso".
+newCellBeforeMove(R, C, V) :- choose(R, C), cell(R, C, PrevV), V = PrevV + 1. % ==== Aggiorniamo cella scelta
+newCellBeforeMove(R, C, V) :- choose(R1, C1), V = 0, couple(R1, C1, R, C).    % ==== Aggiorniamo celle vicine a quella scelta
 newCellBeforeMove(R, C, V) :- cell(R, C, V), not choose(R,C), choose(R1, C1), not couple(R1,C1,R,C). % ==== Copio celle non modificate
 
+% ==== Effettua un ordinamento sulle righe, inserendo prima le celle aventi valore V=0.
 newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R,C,V), V != 0.
 newColumnSortedByRow(R,C,V) :- newCellBeforeMove(R1,C,V), V=0, R = 0-R1.
 
+% ==== Trova le nuove celle della nuova matrice, TENENDO CONTO della "gravità verso il basso".
 newCell(R,C,V) :- newColumnSortedByRow(R1,C,V), V!=0,
                     R = #count{R2 : newColumnSortedByRow(R2,C,V2), R1 > R2}.
                     
 newCell(R,C,0) :- newColumnSortedByRow(R1,C,0),
                     R = #count{R2 : newColumnSortedByRow(R2,C,0), R1 > R2}.
                     
+% ==== Utile per tenere traccia della nuova posizione della cella scelta.
 newMatrixChoose(R,C) :- choose(R1,C), R = #count{R2 : newColumnSortedByRow(R2,C,V2), R1 > R2}.
+
+
+
+
 
 
 % ===================================== WEAK CONSTRAINTS ===================================== %
 
 
-% ==== (@6) Cerco tutti i vicini diretti a quella scelta, il cui valore sia V+1
-newDirectCouple(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
-newDirectCouple(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
-newNumbOfDirectNeighborhoors(N):- #count{R,C : newDirectCouple(R,C)}=N.
-:~ newNumbOfDirectNeighborhoors(N). [25-N@6]
+
+% ==================================== [LIVELLO @7+V]
+% ==== Data una nuova cella, calcola, per ogni vicino diretto, la differenza tra i loro valori.
+% ==== Successivamente, trova il minimo tra queste differenze.
+% ==== Si preferisce minimizzare questa differenza.
+diffBetweenNewCells(R1, C1, R2, C2, Diff):- newCouple(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
+minDiffBetweenNewCells(R1, C1, Min):- #min{ Diff:  diffBetweenNewCells(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
+:~ newCell(R,C,V), minDiffBetweenNewCells(R,C,Min). [Min@7+V, R,C,V,Min]
 
 
-%=================================================================== 
 
-% ==== Vicino sopra o sotto della nuova matrice
+
+% ==================================== [LIVELLO @8]
+% ==================================== [LIVELLO @7]
+
+% ==== Le nuove coppie dirette (su riga) nella nuova matrice
 newCouple(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V), newCell(R2, C, V), &abs(R1-R2; Diff), Diff = 1, V!=0.
 
-% ==== Vicino destra o sinistra della nuova matrice
+% ==== Le nuove coppie dirette (su colonna) nella nuova matrice
 newCouple(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V), newCell(R, C2, V), &abs(C1-C2; Diff), Diff = 1, V!=0.
+
+% ==== Calcola il numero di nuove coppie dirette che si formano
 numbOfNewCouple(R,C,N):- #count{R1,C1 : newCouple(R, C, R1, C1)}=N, newCell(R,C,_).
+
+% ==== Si preferisce massimizzare il numero di nuove coppie con valori alti.
 :~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [11-V@8, R,C,V,N]
+%:~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [1@V, R,C,V,N]
+
+% ==== Se le nuove celle vicine non hanno stesso valore, si preferisce minimizzare la differenza tra i loro valori.
 :~ newCell(R,C,V), newCell(R1,C1,V1),  not sameCell(R,C,R1,C1), newCouple(R,C,R1,C1), V!=V1,V!=0, &abs(V-V1; Diff). [Diff@7, R,C,V, R1,C1,V1]
 
 
 
-%===================================================================
-%=========== data la matrice futura la strategia cambia quando posso accoppiare celle alte (>= 7)
 
-:~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [1@V, R,C,V,N]
+% ==================================== [LIVELLO @6]
 
-diffBetweenNewCells(R1, C1, R2, C2, Diff):- newNeighborhoors(R1, C1, R2, C2), newCell(R1,C1,V1), newCell(R2,C2,V2), not sameCell(R1,C1,R2,C2), &abs(V1-V2; Diff).
-minDiffBetweenNewCells(R1, C1, Min):- #min{ Diff:  diffBetweenNewCells(R1, C1, R2, C2, Diff)}=Min , newCell(R1,C1).
-
-:~newCell(R,C,V), minDiffBetweenNewCells(R,C,Min). [Min@7+V, R,C,V,Min]
-
-
-
-% ==== Vicino sopra o sotto
-newNeighborhoors(R1, C, R2, C) :- R1 != R2, newCell(R1, C, V1), newCell(R2, C, V2), &abs(R1-R2; Diff), Diff = 1.
-
-% ==== Vicino destra o sinistra
-newNeighborhoors(R, C1, R, C2) :- C1 != C2, newCell(R, C1, V1), newCell(R, C2, V2), &abs(C1-C2; Diff), Diff = 1.
+% ==== Cerca tutte le COPPIE DIRETTE CON LA CELLA SCELTA, il cui valore sia V+1.
+% ==== Si preferisce massimizzare il numero di coppie dirette che si formano.
+newDirectCouple(R1,C) :- newMatrixChoose(R,C), R != R1, newCell(R, C, V), newCell(R1, C, V+1), &abs(R-R1; Diff), Diff = 1.
+newDirectCouple(R,C1) :- newMatrixChoose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V+1), &abs(C-C1; Diff), Diff = 1.
+newNumbOfDirectCouples(N):- #count{R,C : newDirectCouple(R,C)}=N.
+:~ newNumbOfDirectCouples(N). [25-N@6]
 
 
 
 
-
-
-% ==== (@5) Preferisco accorpare celle con valori piu bassi
+% ==================================== [LIVELLO @5]
+% ==== Si preferisce accorpare celle con valori piu bassi
 :~ choose(R,C), cell(R,C,V). [V@5,R,C,V]
 
 
-% ==== (@4 e @3) Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
-%:~ choose(R,C), dim(D), Diff = D-R. [Diff@6, R,C]
 
+
+% ==================================== [LIVELLO @2]
+% ==== Si preferisce accorpare la cella con il maggior numero di coppie
+maxNumbOfCouple(M) :- M = #max{N: numbOfCouples(R, C, N)}.
+:~ choose(R, C), numbOfCouples(R, C, N), not maxNumbOfCouple(N). [1@2, R,C]
+
+
+
+
+#show choose/2.
+#show newCell/3.
+
+
+
+
+% ===================================== TEMPORANEAMENTE NON USATE =========================== %
+
+% :- cell(R,C,V), numbOfCouples(R,C,N), N>6, not choose(R,C), N=#max{N2,R1,C1 : numbOfCouples(R1,C1,N2)}.
+
+% ==== Scegliere celle piu in basso a destra, cosi da avere numeri grandi in basso
+%:~ choose(R,C), dim(D), Diff = D-R. [Diff@6, R,C]
 %:~ choose(R,C), dim(D), Diff = D-C. [Diff@5, R,C] % DESTRA
 %:~ choose(R,C), orientation("dx"), dim(D), Diff = D-C. [Diff@3, R,C] % DESTRA
 %:~ choose(R,C), orientation("sx"), dim(D), Diff = D-C. [5 - Diff@3, R,C] % SINISTRA
 %:~ not choose(D,D), dim(D). [1@3, D]
 %:~ not choose(D,0), dim(D). [1@6, D]
 
-% ==== (4) Preferenza celle con maggior numero di vicini
-maxNumbOfCouple(M) :- M = #max{N: numbOfCouples(R, C, N)}.
-:~ choose(R, C), numbOfCouples(R, C, N), not maxNumbOfCouple(N). [1@2, R,C]
-
-
-% ==== Preferisco celle con vicini con valori "piu vicini" a quello scelto
-% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore � diverso da quello scelto e da V+1
+% ==== Preferibile accorpare celle con vicini con valori "piu vicini" a quello scelto
+% ==== allNextNeighValues : tutti i valori delle celle vicine il cui valore sia diverso da quello scelto e da V+1
 %allNextNeighValues(R1,C,V2):- choose(R,C), R != R1, newCell(R, C, V), newCell(R1, C, V2), V!=V2, V2!=V+1, &abs(R-R1; Diff), Diff = 1.
 %allNextNeighValues(R,C1, V2):- choose(R,C), C != C1, newCell(R, C, V), newCell(R, C1, V2), V!=V2, V2!=V+1, &abs(C-C1; Diff), Diff = 1.
 %:~choose(R,C),newCell(R,C,V), allNextNeighValues(R1,C1,V2), &abs(V-V2; Diff). [Diff@2, R,C,V,R1,C1,V2]
-
-#show choose/2.
-#show newCell/3.
