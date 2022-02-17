@@ -52,7 +52,7 @@ public class App extends Application implements EventHandler<ActionEvent> {
 
 		initScene(stage);
 
-		createHandler(HandlerType.WINDOWS);
+		createHandler(HandlerType.LINUX);
 		registerClasses();
 
 		Timeline t = new Timeline(new KeyFrame(Duration.millis(550), this));

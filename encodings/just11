@@ -62,7 +62,7 @@ numbOfCouples(R, C, N) :- cell(R, C, V), N = #count{R1, C1: couple(R, C, R1, C1)
 % ==== Così facendo, si ha una matrice M1 avente alcune celle con valore 0. I nuovi valori saranno
 % ==== calcolati casualmente alla prossima interazione, perciò non è dato sapere quali saranno.
 % ==== Tuttavia, con la nuova matrice, è possibile tenere in considerazioni nuovi fattori, come
-% ==== le nuove coppie che si formano.
+% ==== le nuove coppie che si formano il cui valore non sia 0.
 
 
 % ==== Le nuove celle della nuova matrice, SENZA "gravita verso il basso".
@@ -118,6 +118,7 @@ numbOfNewCouple(R,C,N):- #count{R1,C1 : newCouple(R, C, R1, C1)}=N, newCell(R,C,
 
 % ==== Si preferisce massimizzare il numero di nuove coppie con valori alti.
 :~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [11-V@8, R,C,V,N]
+
 %:~ newCell(R,C,V), numbOfNewCouple(R,C,N), N=0. [1@V, R,C,V,N]
 
 % ==== Se le nuove celle vicine non hanno stesso valore, si preferisce minimizzare la differenza tra i loro valori.
