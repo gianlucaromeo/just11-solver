@@ -2,7 +2,7 @@
 
 ### Project Overview
 
-Just11 Solver is a Java application developed using JavaFX and Answer Set Programming (ASP) techniques to solve the Just11 game.
+Just11 Solver is a Java application developed using JavaFX and Answer Set Programming (ASP) techniques to solve the Just11 game, developed for the "Artificial Intelligence" course during my Bachelor's degree in 2021.
 
 ### What is Answer Set Programming (ASP)?
 
